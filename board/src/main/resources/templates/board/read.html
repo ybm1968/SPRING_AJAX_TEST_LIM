@@ -40,28 +40,6 @@
 
         <!-- 댓글 목록 -->
         <div id="comment-list">
-            <!-- 
-            <div class="comment-box">
-                <div class="top">
-                    <div class="item">
-                        <span class="comment-writer">작성자</span>
-                        <span class="comment-date">2023-10-05</span>
-                    </div>
-                    <div class="item">
-                        <a href="javascript:;" class="btn btn-sm btn-comment-update">수정</a>
-                        <a href="javascript:;" class="btn btn-sm btn-comment-delete">삭제</a>
-                    </div>
-                </div>
-                <div class="bottom">
-                    <p class="comment-content">
-                        안녕하세요 댓글입니다...
-                    </p>
-                    <div class="etc-box">
-                        <a href="javascript:;" class="btn btn-sm btn-comment">답글</a>
-                    </div>
-                </div>
-            </div>
-            -->
         </div>
 
         <!-- 댓글 입력 -->
@@ -88,11 +66,13 @@
         </div>
     </form>
 
+    <!-- script -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
     <script>
         let form = document.getElementById('form')
         // 👩‍💻 모델 객체를 자바스크립트에서 표현하는 방법
         let boardNo = "[[${board.boardNo}]]"
-        let btnFileDelete = document.querySelectorAll(".btn-file-delete")
         
         // 목록으로 이동
         function moveList() {
@@ -118,16 +98,11 @@
         // 댓글 목록 조회
         function getCommentList() {
 
-            const url = '/comment'
-
-            let data = {
-                'boardNo' : boardNo
-            }
+            const url = '/comment/' + boardNo 
 
             $.ajax({
                 url : url,
                 type : 'get',
-                data : data,
                 success : function(response) {
                     let commentList = response
 
@@ -158,9 +133,6 @@
                                     </div>
                                     <div class="bottom">
                                         <p class="comment-content">${comment.content}</p>
-                                        <div class="etc-box">
-                                            <a href="javascript:;" class="btn btn-sm btn-comment" data="${comment.commentNo}">답글</a>
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="edit-box"></div>
@@ -183,7 +155,6 @@
 
         // 댓글 등록 버튼 - 클릭 이벤트
         $('#btn-comment-insert').on('click', function() {
-            alert('sads')
             let writer = $('#comment-writer').val()
             let content = $('#comment-content').val()
 
@@ -193,11 +164,9 @@
         // 댓글 등록
         function insertComment( writer, content ) {
 
-            const url = '/comment'
+            const url = '/comment/' + boardNo
 
             let data = {
-                'parentNo'   : boardNo,
-                'parentTable' : 'board',
                 'writer'    : writer,
                 'content'   : content,
             }
@@ -205,11 +174,12 @@
             $.ajax({
                 url : url,
                 type : 'POST',
-                data : data,
+                data : JSON.stringify(data),
+                contentType : 'application/json',
                 success : function(response) {
                     let result = response
 
-                    if( result == 'SUCCESS' ) {
+                    if( result == '댓글 등록 완료' ) {
                         alert('댓글 등록이 완료되었습니다.')
                         // 댓글 목록 갱신
                         getCommentList()
@@ -224,6 +194,133 @@
                     alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
                 }
             })
+        }
+
+
+        function initCommentEvent() {
+
+            // 댓글 [수정]
+            $('.btn-comment-update').on('click', function() {
+                // 작성자, 내용 가져오기
+                let btn = $(this)
+                let commentNo = btn.attr('data')
+                let commentBox = btn.parents('.comment-box')
+                let commentWriter = commentBox.find('.comment-writer')
+                let commentContent = commentBox.find('.comment-content')
+
+                let writer = commentWriter.text()
+                let content = commentContent.text()
+
+                console.log( btn.parents() )                        // 부모요소
+                console.log( btn.parents('.comment-box') )          // 특정 상위요소
+                console.log( commentBox.children() )                // 자식요소
+                console.log( commentBox.find('.comment-writer') )   // 특정 하위요소
+                console.log( writer );
+                console.log( content );
+
+                // 수정 중인 다른 댓글 UI 초기화
+                $('.data-box').show()
+                $('.edit-box').empty()
+                $('.reply-box').remove()
+
+                // 댓글 보기 숨김
+                commentBox.find('.data-box').hide()
+
+                // 댓글 수정 UI 추가
+                let editBox 
+                = `<div class="top">
+                        <div class="item">
+                            <input type="text" id="input-update-writer" value="${writer}" />
+                        </div>
+                        <div class="item">
+                            
+                        </div>
+                    </div>
+                    <div class="bottom">
+                        <textarea id="input-update-content" cols="40" rows="5">${content}</textarea>
+                        <div class="etc-box">
+                            <a href="javascript:;" class="btn btn-sm" id="btn-comment-update" data="${commentNo}">수정</a>
+                            <a href="javascript:;" class="btn btn-sm" id="btn-comment-cancel">취소</a>
+                        </div>
+                    </div>
+                    `
+                commentBox.find('.edit-box').html(editBox)    
+
+                // 댓글 [수정] 취소 버튼 클릭
+                $('#btn-comment-cancel').on('click', function() {
+
+                    commentBox.find('.data-box').show()
+                    commentBox.find('.edit-box').empty()
+                    // $('.comment-box .data-box').show()
+                    // $('.comment-box .edit-box').empty()
+                })
+
+                // 댓글 [수정] 수정 버튼 클릭
+                $('#btn-comment-update').on('click', function() {
+
+                    let url = `/comment/${boardNo}/${commentNo}`
+
+                    let data = {
+                        writer      : $('#input-update-writer').val(),
+                        content     : $('#input-update-content').val(),
+                    }
+
+                    $.ajax({
+                        url     : url,
+                        type    : 'PUT',
+                        data : JSON.stringify(data),
+                        contentType : 'application/json',
+                        success : function(response) {
+                            let result = response
+                            if( result == '댓글 수정 완료' ) {
+                                alert('댓글 수정이 완료되었습니다.')
+                                // 댓글 목록 갱신
+                                getCommentList()
+                            }
+
+                        },
+                        error           : function(request, status, error){
+                            alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                        }
+                    })
+
+
+                })
+
+                
+            })
+
+            // 댓글 [삭제]
+            $('.btn-comment-delete').on('click', function() {
+
+                let check = confirm('정말로 삭제하시겠습니까?')
+                if( !check )
+                    return
+
+                let commentNo = $(this).attr('data')
+
+                let url = `/comment/${boardNo}/${commentNo}`
+
+                $.ajax({
+                    url     : url,
+                    type    : 'DELETE',
+                    success : function(response) {
+                        let result = response
+                        if( result == '댓글 삭제 완료' ) {
+                            alert('댓글 삭제가 완료되었습니다.')
+                            // 댓글 목록 갱신
+                            getCommentList()
+                        }
+
+                    },
+                    error           : function(request, status, error){
+                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                    }
+                })
+
+            })
+
+            
         }
 
     </script>

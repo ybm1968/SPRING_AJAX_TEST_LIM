@@ -5,6 +5,6 @@ CREATE TABLE `board` (
   `content` text,
   `reg_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `upd_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `views` int NOT NULL DEFAULT '0',
+  `good` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`board_no`)
 ) COMMENT='게시판';

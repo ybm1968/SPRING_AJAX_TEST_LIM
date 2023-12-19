@@ -81,6 +81,7 @@ public class CommentController {
             int result = commentService.insert(comment);
             boardNo = comment.getParentNo();
             log.info("댓글 쓰기 처리 후, boardNo : " + boardNo);
+            log.info("result : " + result);
 
             if( result > 0 )
                 return new ResponseEntity<>("댓글 등록 완료", HttpStatus.CREATED);  // 201
