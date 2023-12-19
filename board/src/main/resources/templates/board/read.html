@@ -183,6 +183,7 @@
 
         // 댓글 등록 버튼 - 클릭 이벤트
         $('#btn-comment-insert').on('click', function() {
+            alert('sads')
             let writer = $('#comment-writer').val()
             let content = $('#comment-content').val()
 
@@ -192,7 +193,7 @@
         // 댓글 등록
         function insertComment( writer, content ) {
 
-            const url = 'http://192.168.30.119:8080/api/comment'
+            const url = '/comment'
 
             let data = {
                 'parentNo'   : boardNo,

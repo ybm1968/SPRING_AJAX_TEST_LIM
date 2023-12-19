@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,11 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.joeun.board.dto.Comment;
 import com.joeun.board.service.CommentService;
 
-import ch.qos.logback.core.model.Model;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Controller
+@RestController
 @RequestMapping("/comment")
 public class CommentController {
 
@@ -31,9 +29,9 @@ public class CommentController {
 
     // 댓글 목록
     @GetMapping()
-    public String list(Model model) throws Exception {
+    public ResponseEntity<?> getAll() {
         log.info("[GET] - /comment - 댓글 목록");
-        
+        try {
             List<Comment> commentList = commentService.list();
 
             if(commentList == null) {
@@ -43,7 +41,10 @@ public class CommentController {
                 log.info("댓글 수 : " + commentList.size());
             }
 
-           return ;
+            return new ResponseEntity<>(commentList, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     
     // 댓글 조회
