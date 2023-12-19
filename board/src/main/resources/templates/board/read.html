@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 조회</title>
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <h1>게시글 조회</h1>
+    <form action="/board/delete" method="POST" id="form">
+        <input type="hidden" name="boardNo" th:value="${board.boardNo}">
+        <table>
+            <tr>
+                <td>좋아요</td>
+                <td>
+                    <input type="text" name="good" >
+                </td>
+            </tr>
+            <tr>
+                <td>제목</td>
+                <td>
+                    <input type="text" name="title" th:value="${board.title}">
+                </td>
+            </tr>
+            <tr>
+                <td>작성자</td>
+                <td>
+                    <input type="text" name="writer" th:value="${board.writer}">
+                </td>
+            </tr>
+            <tr>
+                <td>내용</td>
+                <td>
+                    <textarea name="content" cols="40" rows="5" th:text="${board.content}"></textarea>
+                </td>
+            </tr>
+        </table>
+
+        <!-- 댓글 목록 -->
+        <div id="comment-list">
+            <!-- 
+            <div class="comment-box">
+                <div class="top">
+                    <div class="item">
+                        <span class="comment-writer">작성자</span>
+                        <span class="comment-date">2023-10-05</span>
+                    </div>
+                    <div class="item">
+                        <a href="javascript:;" class="btn btn-sm btn-comment-update">수정</a>
+                        <a href="javascript:;" class="btn btn-sm btn-comment-delete">삭제</a>
+                    </div>
+                </div>
+                <div class="bottom">
+                    <p class="comment-content">
+                        안녕하세요 댓글입니다...
+                    </p>
+                    <div class="etc-box">
+                        <a href="javascript:;" class="btn btn-sm btn-comment">답글</a>
+                    </div>
+                </div>
+            </div>
+            -->
+        </div>
+
+        <!-- 댓글 입력 -->
+        <div class="input-box">
+            <div class="top">
+                <h3>댓글 입력</h3>
+            </div>
+            <div class="comment-input">
+                <input type="text" name="writer" id="comment-writer" placeholder="작성자">
+                <br>
+                <textarea name="content" id="comment-content" 
+                          cols="60" rows="5" placeholder="댓글을 작성해주세요"></textarea>
+                <div class="btn-box">
+                    <a href="javascript:;" id="btn-comment-insert" class="btn btn-sm">등록</a>
+                </div>
+            </div>
+        </div>
+
+        
+        <div>
+            <button type="button" onclick="moveList()">목록</button>
+            <button type="button" onclick="moveUpdate()">수정</button>
+            <button type="button" onclick="actionDelete()">삭제</button>
+        </div>
+    </form>
+
+    <script>
+        let form = document.getElementById('form')
+        // 👩‍💻 모델 객체를 자바스크립트에서 표현하는 방법
+        let boardNo = "[[${board.boardNo}]]"
+        let btnFileDelete = document.querySelectorAll(".btn-file-delete")
+        
+        // 목록으로 이동
+        function moveList() {
+            location.href = "/board/list"
+        }
+
+        // 수정으로 이동
+        function moveUpdate() {
+            location.href = "/board/update?boardNo=" + boardNo
+        }
+
+        // 삭제 요청
+        function actionDelete() {
+            let check = confirm('정말로 삭제하시겠습니까?')
+            if( check )
+                form.submit()
+        }
+
+        if( boardNo != null ) {
+            getCommentList()
+        }
+
+        // 댓글 목록 조회
+        function getCommentList() {
+
+            const url = '/comment'
+
+            let data = {
+                'boardNo' : boardNo
+            }
+
+            $.ajax({
+                url : url,
+                type : 'get',
+                data : data,
+                success : function(response) {
+                    let commentList = response
+
+                    console.log(commentList)
+
+                    let commentData = ''
+                    for (let i = 0; i < commentList.length; i++) {
+                        let comment = commentList[i]
+
+                        let date = new Date(comment.regDate);
+                        let regDate = date.toISOString().split("T")[0];
+                        let regTime = date.toISOString().split("T")[1];
+                        regTime = regTime.split(".")[0]
+
+
+                        let commentBox 
+                        = `<div class="comment-box">
+                                <div class="data-box">
+                                    <div class="top">
+                                        <div class="item">
+                                            <span class="comment-writer">${comment.writer}</span>
+                                            <span class="comment-date">${regDate} ${regTime}</span>
+                                        </div>
+                                        <div class="item">
+                                            <a href="javascript:;" class="btn btn-sm btn-comment-update" data="${comment.commentNo}">수정</a>
+                                            <a href="javascript:;" class="btn btn-sm btn-comment-delete" data="${comment.commentNo}">삭제</a>
+                                        </div>
+                                    </div>
+                                    <div class="bottom">
+                                        <p class="comment-content">${comment.content}</p>
+                                        <div class="etc-box">
+                                            <a href="javascript:;" class="btn btn-sm btn-comment" data="${comment.commentNo}">답글</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="edit-box"></div>
+                            </div>
+                            `
+                        commentData += commentBox
+                    }
+
+                    $('#comment-list').html(commentData)
+
+                    // 이벤트 추가
+                    initCommentEvent()
+                    
+                },
+                error : function(error) {
+
+                }
+            })
+        }
+
+        // 댓글 등록 버튼 - 클릭 이벤트
+        $('#btn-comment-insert').on('click', function() {
+            let writer = $('#comment-writer').val()
+            let content = $('#comment-content').val()
+
+            insertComment( writer, content )
+        })
+
+        // 댓글 등록
+        function insertComment( writer, content ) {
+
+            const url = 'http://192.168.30.119:8080/api/comment'
+
+            let data = {
+                'parentNo'   : boardNo,
+                'parentTable' : 'board',
+                'writer'    : writer,
+                'content'   : content,
+            }
+
+            $.ajax({
+                url : url,
+                type : 'POST',
+                data : data,
+                success : function(response) {
+                    let result = response
+
+                    if( result == 'SUCCESS' ) {
+                        alert('댓글 등록이 완료되었습니다.')
+                        // 댓글 목록 갱신
+                        getCommentList()
+
+                        // 작성한 댓글 입력내용 초기화
+                        $('#comment-writer').val('')
+                        $('#comment-content').val('')
+
+                    }
+                },
+                error           : function(request, status, error){
+                    alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                }
+            })
+        }
+
+    </script>
+</body>
+</html>
