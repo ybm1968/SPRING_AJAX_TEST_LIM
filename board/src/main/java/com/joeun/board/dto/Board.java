@@ -19,8 +19,6 @@ public class Board {
     private String content;
     private Date regDate;
     private Date updDate;
-    private int views;
-
-    private List<MultipartFile> file;
+    private int good;
 }
  

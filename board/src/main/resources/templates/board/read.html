@@ -15,25 +15,26 @@
             <tr>
                 <td>좋아요</td>
                 <td>
-                    <input type="text" name="good" >
+                    <input type="text" name="good" id="inputGood">
+                    <button type="button" id="good">좋아요</button>
                 </td>
             </tr>
             <tr>
                 <td>제목</td>
                 <td>
-                    <input type="text" name="title" th:value="${board.title}">
+                    <input type="text" name="title" id="title" th:value="${board.title}">
                 </td>
             </tr>
             <tr>
                 <td>작성자</td>
                 <td>
-                    <input type="text" name="writer" th:value="${board.writer}">
+                    <input type="text" name="writer" id="writer" th:value="${board.writer}">
                 </td>
             </tr>
             <tr>
                 <td>내용</td>
                 <td>
-                    <textarea name="content" cols="40" rows="5" th:text="${board.content}"></textarea>
+                    <textarea name="content" id="content" cols="40" rows="5" th:text="${board.content}"></textarea>
                 </td>
             </tr>
         </table>
@@ -89,6 +90,54 @@
             let check = confirm('정말로 삭제하시겠습니까?')
             if( check )
                 form.submit()
+        }
+
+        initGood()
+
+        $('#good').on('click', function () {
+            good()
+        })
+
+        function initGood() {
+            
+            const url = `/good/${boardNo}`
+
+            $.ajax({
+                url : url,
+                type : 'GET',
+                success : function(response) {
+                    console.log(response);
+                    console.log(response.good);
+                    let count = response.good
+                    
+                    $('#inputGood').val(count)
+
+                },
+                error           : function(request, status, error){
+                    alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                }
+            })
+
+        }
+
+        function good() {
+            
+            const url = `/good/${boardNo}`
+
+            $.ajax({
+                url : url,
+                type : 'PUT',
+                success : function(response) {
+                    let result = response
+                    if ( result = 'success') {
+                        initGood()
+                    }
+                },
+                error : function(request, status, error){
+                    alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                }
+            })
+
         }
 
         if( boardNo != null ) {

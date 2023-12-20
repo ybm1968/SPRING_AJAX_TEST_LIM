@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import com.joeun.board.dto.Board;
 import com.joeun.board.mapper.BoardMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class BoardServiceImpl implements BoardService {
 
@@ -45,8 +48,8 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public int updateViews(int count, int no) throws Exception {
-        int result = boardMapper.updateViews(count, no);
+    public int goodUpdate(Board board) throws Exception {
+        int result = boardMapper.goodUpdate(board);
         return result;
     }
 

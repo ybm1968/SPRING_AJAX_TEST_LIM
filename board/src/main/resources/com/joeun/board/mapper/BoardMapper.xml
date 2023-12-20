@@ -32,6 +32,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
            SET title = #{title}
               ,writer = #{writer}
               ,content = #{content}
+              ,good = #{good}
               ,upd_date = now()
         WHERE board_no = #{boardNo}
     </update>
@@ -42,10 +43,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         WHERE board_no = #{boardNo}
     </delete>
 
-    <!-- 조회수 업데이트 -->
-    <update id="updateViews">
-        UPDATE board
-           SET views = views + #{count}
+    <!-- 조회수 수정 -->
+    <update id="goodUpdate">
+        update board
+        set good = #{good}
         WHERE board_no = #{boardNo}
     </update>
 
