@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.joeun.board.dto.Board;
+import com.joeun.board.dto.Page;
 import com.joeun.board.service.BoardService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequestMapping("/board")
 public class BoardController {
-
+    
     // 한꺼번에 import : alt + shift + O
 
     @Autowired
@@ -50,18 +51,37 @@ public class BoardController {
      * @return
      * @throws Exception
      */
-    @GetMapping(value="/list")
-    public String list(Model model) throws Exception {
-        log.info("[GET] - /board/list");
+    // @GetMapping(value="/list")
+    // public String list(Model model) throws Exception {
+    //     log.info("[GET] - /board/list");
+        
+    //     // 데이터 요청
+    //     List<Board> boardList= boardService.list();
+    //     // 모델 등록
+    //     model.addAttribute("boardList", boardList);
+    //     // 뷰 페이지 지정
+    //     return "board/list";
+    // }
+    
+    @GetMapping("/list")
+    public String list(@RequestParam(defaultValue = "1") int page,
+                              @RequestParam(defaultValue = "5") int pageSize,
+                              Model model) {
+        log.info("page : " + page);
+        log.info("pageSize : " + pageSize);
+        int totalItems = boardService.countEntities(); // Implement this method in your service
+        List<Board> boardList = boardService.findEntitiesWithPaging(page, pageSize);
+    
+        // Set the number of visible pages you want to show in the pagination
+        int visiblePages = 10;
+    
+        Page pageInfo = boardService.calculatePageInformation(totalItems, pageSize, page, visiblePages);
 
-        // 데이터 요청
-        List<Board> boardList= boardService.list();
-        // 모델 등록
         model.addAttribute("boardList", boardList);
-        // 뷰 페이지 지정
+        model.addAttribute("pageInfo", pageInfo);
+    
         return "board/list";
     }
-
 
     /**
      * 게시글 조회
@@ -184,5 +204,6 @@ public class BoardController {
         // 뷰 페이지 지정
         return "redirect:/board/list";
     }
-    
+
+
 }

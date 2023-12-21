@@ -50,4 +50,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         WHERE board_no = #{boardNo}
     </update>
 
+    <select id="countEntities" resultType="int">
+        SELECT COUNT(*) FROM board
+    </select>
+
+    <select id="findEntitiesWithPaging" resultType="Board">
+        SELECT * FROM board
+        ORDER BY reg_date DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
 </mapper>

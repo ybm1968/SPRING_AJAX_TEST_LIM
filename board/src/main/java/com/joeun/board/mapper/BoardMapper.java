@@ -23,4 +23,7 @@ public interface BoardMapper {
     // 조회수 수정
     public int goodUpdate(Board board) throws Exception;
 
+    int countEntities();
+
+    List<Board> findEntitiesWithPaging(@Param("offset") int offset, @Param("limit") int limit);
 }

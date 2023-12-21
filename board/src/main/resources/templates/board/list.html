@@ -57,15 +57,31 @@
         </tr>
     </table>
 
+    <div th:if="${pageInfo.totalPages > 1}">
+        <span th:if="${pageInfo.hasPrevious}">
+            <a th:href="|/board/list?page=1|"><<</a>
+            <a th:href="|/board/list?page=${pageInfo.currentPage - 1}|"><</a>
+        </span>
+
+        <span th:each="pageNumber : ${#numbers.sequence(pageInfo.startPage, pageInfo.endPage)}">
+            <a th:href="|/board/list?page=${pageNumber}|" th:text="${pageNumber}"></a>
+        </span>
+
+        <span th:if="${pageInfo.hasNext}">
+            <a th:href="|/board/list?page=${pageInfo.currentPage + 1}|">></a>
+            <a th:href="|/board/list?page=${pageInfo.totalPages}|">>></a>
+        </span>
+    </div>
 
 
 
-    <div class="pagination">
+
+    <!-- <div class="pagination">
         <a href="javascript:;" class="page-arrow" id="first">&laquo;</a>
         <a href="javascript:;" class="page-arrow" id="prev">&lsaquo;</a>
 
         <div class="page-list">
-            <!-- <a href="javascript:;" class="page-no">1</a>
+            <a href="javascript:;" class="page-no">1</a>
             <a href="javascript:;" class="page-no">2</a>
             <a href="javascript:;" class="page-no">3</a>
             <a href="javascript:;" class="page-no">4</a>
@@ -74,14 +90,14 @@
             <a href="javascript:;" class="page-no">7</a>
             <a href="javascript:;" class="page-no">8</a>
             <a href="javascript:;" class="page-no">9</a>
-            <a href="javascript:;" class="page-no">10</a> -->
+            <a href="javascript:;" class="page-no">10</a>
         </div>
 
         <a href="javascript:;" class="page-arrow" id="next">&rsaquo;</a>
         <a href="javascript:;" class="page-arrow" id="last">&raquo;</a>
-    </div>
+    </div> -->
 
-    <script>
+    <!-- <script>
         // 페이지 관련 변수
         let page = 1            // 현재 페이지 번호
         let rows = 10           // 페이지당 게시글 수
@@ -272,6 +288,6 @@
 
 
 
-    </script>
+    </script> -->
 </body>
 </html>
