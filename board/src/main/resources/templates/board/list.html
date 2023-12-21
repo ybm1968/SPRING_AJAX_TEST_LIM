@@ -59,8 +59,8 @@
 
     <div th:if="${pageInfo.totalPages > 1}">
         <span th:if="${pageInfo.hasPrevious}">
-            <a th:href="|/board/list?page=1|"><<</a>
-            <a th:href="|/board/list?page=${pageInfo.currentPage - 1}|"><</a>
+            <a th:href="|/board/list?page=1|"><< </a>
+            <a th:href="|/board/list?page=${pageInfo.currentPage - 1}|">< </a>
         </span>
 
         <span th:each="pageNumber : ${#numbers.sequence(pageInfo.startPage, pageInfo.endPage)}">
@@ -68,8 +68,8 @@
         </span>
 
         <span th:if="${pageInfo.hasNext}">
-            <a th:href="|/board/list?page=${pageInfo.currentPage + 1}|">></a>
-            <a th:href="|/board/list?page=${pageInfo.totalPages}|">>></a>
+            <a th:href="|/board/list?page=${pageInfo.currentPage + 1}|"> ></a>
+            <a th:href="|/board/list?page=${pageInfo.totalPages}|"> >></a>
         </span>
     </div>
 

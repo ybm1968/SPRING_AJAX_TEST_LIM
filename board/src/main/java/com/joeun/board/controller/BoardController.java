@@ -43,26 +43,6 @@ public class BoardController {
     @Autowired
     private BoardService boardService;
 
-    /**
-     * 게시글 목록
-     * [GET]
-     * /board/list
-     * model : boardList
-     * @return
-     * @throws Exception
-     */
-    // @GetMapping(value="/list")
-    // public String list(Model model) throws Exception {
-    //     log.info("[GET] - /board/list");
-        
-    //     // 데이터 요청
-    //     List<Board> boardList= boardService.list();
-    //     // 모델 등록
-    //     model.addAttribute("boardList", boardList);
-    //     // 뷰 페이지 지정
-    //     return "board/list";
-    // }
-    
     @GetMapping("/list")
     public String list(@RequestParam(defaultValue = "1") int page,
                               @RequestParam(defaultValue = "5") int pageSize,
@@ -72,7 +52,6 @@ public class BoardController {
         int totalItems = boardService.countEntities(); // Implement this method in your service
         List<Board> boardList = boardService.findEntitiesWithPaging(page, pageSize);
     
-        // Set the number of visible pages you want to show in the pagination
         int visiblePages = 10;
     
         Page pageInfo = boardService.calculatePageInformation(totalItems, pageSize, page, visiblePages);
